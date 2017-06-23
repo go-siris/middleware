@@ -4,15 +4,15 @@ package main
 // $ go run main.go
 
 import (
-	"github.com/kataras/iris"
-	"github.com/kataras/iris/context"
+	"github.com/go-siris/siris"
+	"github.com/go-siris/siris/context"
 
-	"github.com/iris-contrib/middleware/cors"
+	"github.com/go-siris/middleware/cors"
 )
 
 func main() {
 
-	app := iris.New()
+	app := siris.New()
 	crs := cors.New(cors.Options{
 		AllowedOrigins:   []string{"*"}, // allows everything, use that to change the hosts.
 		AllowCredentials: true,
@@ -40,5 +40,5 @@ func main() {
 	// 	AllowedOrigins:   []string{"*"},
 	// 	AllowCredentials: true,
 	// }))
-	app.Run(iris.Addr("localhost:8080"))
+	app.Run(siris.Addr("localhost:8080"))
 }

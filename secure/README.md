@@ -11,7 +11,7 @@ Secure is an HTTP middleware for Go that facilitates some quick security wins.
 ## Install
 
 ```sh
-$ go get -u github.com/iris-contrib/middleware/secure
+$ go get -u github.com/go-siris/middleware/secure
 ```
 
 ## How to use
@@ -20,8 +20,9 @@ $ go get -u github.com/iris-contrib/middleware/secure
 package main
 
 import (
-	"gopkg.in/kataras/iris.v6"
-	"github.com/iris-contrib/middleware/secure"
+	"github.com/go-siris/siris"
+	"github.com/go-siris/siris/context"
+	"github.com/go-siris/middleware/secure"
 )
 
 func main() {
@@ -45,10 +46,10 @@ func main() {
 		IsDevelopment: true, // This will cause the AllowedHosts, SSLRedirect, and STSSeconds/STSIncludeSubdomains options to be ignored during development. When deploying to production, be sure to set this to false.
 	})
 
-	app := iris.New()
+	app := siris.New()
 	app.Use(s)
 
-	app.Get("/home", func(ctx *iris.Context) {
+	app.Get("/home", func(ctx *context.Context) {
 		ctx.Writef("Hello from /home")
 	})
 

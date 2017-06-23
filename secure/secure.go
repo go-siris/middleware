@@ -1,4 +1,4 @@
-// This has been cloned to work with Iris,
+// This has been cloned to work with Siris,
 // credits goes to https://github.com/unrolled/secure , I did nothing special here.
 
 package secure
@@ -8,8 +8,8 @@ import (
 	"net"
 	"strings"
 
-	"github.com/kataras/iris"
-	"github.com/kataras/iris/context"
+	"github.com/go-siris/siris"
+	"github.com/go-siris/siris/context"
 )
 
 const (
@@ -27,7 +27,7 @@ const (
 )
 
 func defaultBadHostHandler(ctx context.Context) {
-	ctx.StatusCode(iris.StatusInternalServerError)
+	ctx.StatusCode(siris.StatusInternalServerError)
 	ctx.Text("Bad Host")
 }
 
@@ -100,7 +100,7 @@ func (s *Secure) SetBadHostHandler(handler context.Handler) {
 	s.badHostHandler = handler
 }
 
-// Serve implements the context.HandlerFunc for integration with iris.
+// Serve implements the context.HandlerFunc for integration with siris.
 func (s *Secure) Serve(ctx context.Context) {
 	// Let secure process the request. If it returns an error,
 	// that indicates the request should not continue.
@@ -158,9 +158,9 @@ func (s *Secure) Process(ctx context.Context) error {
 			url.Host = s.opt.SSLHost
 		}
 
-		status := iris.StatusMovedPermanently
+		status := siris.StatusMovedPermanently
 		if s.opt.SSLTemporaryRedirect {
-			status = iris.StatusTemporaryRedirect
+			status = siris.StatusTemporaryRedirect
 		}
 
 		ctx.Redirect(url.String(), status)

@@ -3,14 +3,14 @@ package cors
 import (
 	"net/http"
 
-	"github.com/kataras/iris/context"
-	"github.com/kataras/iris/core/handlerconv"
+	"github.com/go-siris/siris/context"
+	"github.com/go-siris/siris/core/handlerconv"
 
 	"github.com/rs/cors"
 )
 
 // Options is a configuration container to setup the CORS.
-// All Options are working EXCEPT on some routers (and the iris' default)
+// All Options are working EXCEPT on some routers (and the Siris' default)
 // AllowMethods field is not working.
 type Options cors.Options
 
@@ -30,7 +30,7 @@ func Default() context.Handler {
 }
 
 // WrapNext is the same as New but it is being used to wrap the entire
-// Iris' router, even before the method and path matching,
+// Siris' router, even before the method and path matching,
 // i.e: app.WrapRouter(WrapNext(Options{...}))
 func WrapNext(opts Options) func(http.ResponseWriter, *http.Request, http.HandlerFunc) {
 	h := cors.New(cors.Options(opts)).ServeHTTP

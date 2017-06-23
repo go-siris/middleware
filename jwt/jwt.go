@@ -8,22 +8,22 @@ import (
 
 	"github.com/dgrijalva/jwt-go"
 
-	"github.com/kataras/iris"
-	"github.com/kataras/iris/context"
+	"github.com/go-siris/siris"
+	"github.com/go-siris/siris/context"
 )
 
-// Iris provides some basic middleware, most for your learning courve.
-// You can use any net/http compatible middleware with iris.ToHandler wrapper.
+// Siris provides some basic middleware, most for your learning courve.
+// You can use any net/http compatible middleware with siris.ToHandler wrapper.
 //
 // JWT net/http video tutorial for golang newcomers: https://www.youtube.com/watch?v=dgJFeqeXVKw
 //
 // Unlike the other middleware, this middleware was cloned from external source: https://github.com/auth0/go-jwt-middleware
-// (because it used "context" to define the user but we don't need that so a simple iris.ToHandler wouldn't work as expected.)
+// (because it used "context" to define the user but we don't need that so a simple siris.ToHandler wouldn't work as expected.)
 // jwt_test.go also didn't created by me:
 // 28 Jul 2016
 // @heralight heralight add jwt unit test.
 //
-// So if this doesn't works for you just try other net/http compatible middleware and bind it via `iris.ToHandler(myHandlerWithNext)`,
+// So if this doesn't works for you just try other net/http compatible middleware and bind it via `siris.ToHandler(myHandlerWithNext)`,
 // It's here for your learning curve.
 
 // A function called whenever an error is encountered
@@ -43,7 +43,7 @@ type Middleware struct {
 
 // OnError default error handler
 func OnError(ctx context.Context, err string) {
-	ctx.StatusCode(iris.StatusUnauthorized)
+	ctx.StatusCode(siris.StatusUnauthorized)
 	ctx.Writef(err)
 }
 
@@ -139,7 +139,7 @@ func FromFirst(extractors ...TokenExtractor) TokenExtractor {
 // CheckJWT the main functionality, checks for token
 func (m *Middleware) CheckJWT(ctx context.Context) error {
 	if !m.Config.EnableAuthOnOptions {
-		if ctx.Method() == iris.MethodOptions {
+		if ctx.Method() == siris.MethodOptions {
 			return nil
 		}
 	}
