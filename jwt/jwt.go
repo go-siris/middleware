@@ -7,32 +7,34 @@ import (
 	"strings"
 
 	"github.com/dgrijalva/jwt-go"
-	"gopkg.in/kataras/iris.v6"
+
+	"github.com/go-siris/siris"
+	"github.com/go-siris/siris/context"
 )
 
-// Iris provides some basic middleware, most for your learning courve.
-// You can use any net/http compatible middleware with iris.ToHandler wrapper.
+// Siris provides some basic middleware, most for your learning courve.
+// You can use any net/http compatible middleware with siris.ToHandler wrapper.
 //
 // JWT net/http video tutorial for golang newcomers: https://www.youtube.com/watch?v=dgJFeqeXVKw
 //
 // Unlike the other middleware, this middleware was cloned from external source: https://github.com/auth0/go-jwt-middleware
-// (because it used "context" to define the user but we don't need that so a simple iris.ToHandler wouldn't work as expected.)
+// (because it used "context" to define the user but we don't need that so a simple siris.ToHandler wouldn't work as expected.)
 // jwt_test.go also didn't created by me:
 // 28 Jul 2016
 // @heralight heralight add jwt unit test.
 //
-// So if this doesn't works for you just try other net/http compatible middleware and bind it via `iris.ToHandler(myHandlerWithNext)`,
+// So if this doesn't works for you just try other net/http compatible middleware and bind it via `siris.ToHandler(myHandlerWithNext)`,
 // It's here for your learning curve.
 
 // A function called whenever an error is encountered
-type errorHandler func(*iris.Context, string)
+type errorHandler func(context.Context, string)
 
 // TokenExtractor is a function that takes a context as input and returns
 // either a token or an error.  An error should only be returned if an attempt
 // to specify a token was found, but the information was somehow incorrectly
 // formed.  In the case where a token is simply not present, this should not
 // be treated as an error.  An empty string should be returned in that case.
-type TokenExtractor func(*iris.Context) (string, error)
+type TokenExtractor func(context.Context) (string, error)
 
 // Middleware the middleware for JSON Web tokens authentication method
 type Middleware struct {
@@ -40,8 +42,8 @@ type Middleware struct {
 }
 
 // OnError default error handler
-func OnError(ctx *iris.Context, err string) {
-	ctx.SetStatusCode(iris.StatusUnauthorized)
+func OnError(ctx context.Context, err string) {
+	ctx.StatusCode(siris.StatusUnauthorized)
 	ctx.Writef(err)
 }
 
@@ -77,12 +79,12 @@ func (m *Middleware) logf(format string, args ...interface{}) {
 }
 
 // Get returns the user (&token) information for this client/request
-func (m *Middleware) Get(ctx *iris.Context) *jwt.Token {
-	return ctx.Get(m.Config.ContextKey).(*jwt.Token)
+func (m *Middleware) Get(ctx context.Context) *jwt.Token {
+	return ctx.Values().Get(m.Config.ContextKey).(*jwt.Token)
 }
 
 // Serve the middleware's action
-func (m *Middleware) Serve(ctx *iris.Context) {
+func (m *Middleware) Serve(ctx context.Context) {
 	err := m.CheckJWT(ctx)
 
 	// If there was an error, do not call next.
@@ -93,9 +95,9 @@ func (m *Middleware) Serve(ctx *iris.Context) {
 
 // FromAuthHeader is a "TokenExtractor" that takes a give context and extracts
 // the JWT token from the Authorization header.
-func FromAuthHeader(ctx *iris.Context) (string, error) {
+func FromAuthHeader(ctx context.Context) (string, error) {
 
-	authHeader := ctx.RequestHeader("Authorization")
+	authHeader := ctx.GetHeader("Authorization")
 	if authHeader == "" {
 		return "", nil // No error, just no token
 	}
@@ -112,7 +114,7 @@ func FromAuthHeader(ctx *iris.Context) (string, error) {
 // FromParameter returns a function that extracts the token from the specified
 // query string parameter
 func FromParameter(param string) TokenExtractor {
-	return func(ctx *iris.Context) (string, error) {
+	return func(ctx context.Context) (string, error) {
 		return ctx.URLParam(param), nil
 	}
 }
@@ -120,7 +122,7 @@ func FromParameter(param string) TokenExtractor {
 // FromFirst returns a function that runs multiple token extractors and takes the
 // first token it finds
 func FromFirst(extractors ...TokenExtractor) TokenExtractor {
-	return func(ctx *iris.Context) (string, error) {
+	return func(ctx context.Context) (string, error) {
 		for _, ex := range extractors {
 			token, err := ex(ctx)
 			if err != nil {
@@ -135,9 +137,9 @@ func FromFirst(extractors ...TokenExtractor) TokenExtractor {
 }
 
 // CheckJWT the main functionality, checks for token
-func (m *Middleware) CheckJWT(ctx *iris.Context) error {
+func (m *Middleware) CheckJWT(ctx context.Context) error {
 	if !m.Config.EnableAuthOnOptions {
-		if ctx.Method() == iris.MethodOptions {
+		if ctx.Method() == siris.MethodOptions {
 			return nil
 		}
 	}
@@ -204,7 +206,7 @@ func (m *Middleware) CheckJWT(ctx *iris.Context) error {
 
 	// If we get here, everything worked and we can set the
 	// user property in context.
-	ctx.Set(m.Config.ContextKey, parsedToken)
+	ctx.Values().Set(m.Config.ContextKey, parsedToken)
 
 	return nil
 }

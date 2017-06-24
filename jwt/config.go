@@ -30,7 +30,7 @@ type Config struct {
 	// Default: false
 	Debug bool
 	// When set, all requests with the OPTIONS method will use authentication
-	// if you enable this option you should register your route with iris.Options(...) also
+	// if you enable this option you should register your route with siris.Options(...) also
 	// Default: false
 	EnableAuthOnOptions bool
 	// When set, the middelware verifies that tokens are signed with the specific signing algorithm
